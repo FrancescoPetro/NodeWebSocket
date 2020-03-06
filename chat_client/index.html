@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Socket.IO chat</title>
+    <link rel="stylesheet" type="text/css" href="chatstyle.css" media="screen">
+</head>
+
+<body>
+
+    <div id="userFormArea" class="row">
+        <div class="col-md-12">
+
+            <label>Username:</label>
+            <form id="userform" action="">
+                <input class="form-control" id="username" />
+                <input type="submit" class="btn btn-primary" value="Enter Chat" />
+            </form>
+        </div>
+    </div>
+    <ul id="messages"></ul>
+
+    <form id="chatform" action="">
+        <input id="m" autocomplete="off" />
+        <button>Send</button>
+    </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+
+        $(function () {
+            var socket = io();
+            var chatform = $('#chatform');
+            var message = $('#m');
+            var userform = $('#userform');
+            var username = $('#username');
+            var userFormArea = $('#userFormArea');
+
+            chatform.submit(function (e) {
+                e.preventDefault(); // prevents page reloading
+                socket.emit('chat message', message.val());
+                message.val('');
+                return false;
+            });
+            socket.on('chat message', function (data) {
+                $('#messages').append($('<li>').text(data.username+": "+data.msg));
+            });
+
+            userform.submit(function (e){
+                e.preventDefault(); // prevents page reloading
+                socket.emit('user login', username.val());
+                username.val('');
+                userFormArea.hide();
+                chatform.show();
+                return false;
+            });
+
+        });
+
+
+    </script>
+</body>
+
+</html>
